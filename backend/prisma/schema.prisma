@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  LEARNER
+}
+
+enum LessonType {
+  VIDEO
+  DOCUMENT
+  IMAGE
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(LEARNER)
+  totalPoints Int    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  coursesCreated   Course[]         @relation("InstructorCourses")
+  quizAttempts     QuizAttempt[]
+  lessonProgress   LessonProgress[]
+
+  @@index([email])
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.Text
+  thumbnail   String?
+  isPublished Boolean  @default(false)
+  instructorId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  instructor User     @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
+  lessons    Lesson[]
+  quizzes    Quiz[]
+
+  @@index([instructorId])
+  @@index([isPublished])
+}
+
+model Lesson {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String?    @db.Text
+  content     String     // URL or file path
+  type        LessonType
+  order       Int
+  duration    Int?       // Duration in minutes
+  courseId    Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  course   Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
+
+  @@index([courseId])
+  @@index([order])
+}
+
+model Quiz {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?  @db.Text
+  courseId    Int
+  maxPoints   Int      @default(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  course    Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions Question[]
+  attempts  QuizAttempt[]
+
+  @@index([courseId])
+}
+
+model Question {
+  id           Int      @id @default(autoincrement())
+  questionText String   @db.Text
+  options      Json     // Array of options: ["Option A", "Option B", "Option C", "Option D"]
+  correctAnswer String  // The correct option
+  points       Int      @default(10)
+  order        Int
+  quizId       Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+  @@index([order])
+}
+
+model QuizAttempt {
+  id            Int      @id @default(autoincrement())
+  quizId        Int
+  userId        Int
+  score         Int
+  attemptNumber Int
+  answers       Json     // Store user's answers: { "questionId": "selectedOption" }
+  createdAt     DateTime @default(now())
+
+  // Relations
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([quizId, userId])
+  @@index([userId])
+}
+
+model LessonProgress {
+  id          Int       @id @default(autoincrement())
+  lessonId    Int
+  userId      Int
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonId, userId])
+  @@index([userId])
+  @@index([lessonId])
+}
