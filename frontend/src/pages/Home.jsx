@@ -1,315 +1,268 @@
-import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth } from '../contexts/AuthContext';
-import { Trophy, Zap, Target, Users, BookOpen, Award, TrendingUp, Star } from 'lucide-react';
+import { BookOpen, Trophy, Zap, Users, Star, ArrowRight, CheckCircle, Brain, Target, ShieldCheck } from 'lucide-react';
 
 const Home = () => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  // Animation Variants
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  };
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
-
-  const features = [
-    { icon: <BookOpen className="w-8 h-8" />, title: 'Rich Course Content', desc: 'Video lessons, documents, and interactive content from expert instructors.' },
-    { icon: <Target className="w-8 h-8" />, title: 'Interactive Quizzes', desc: 'Test your knowledge with game-like quizzes and earn XP with multiple attempts.' },
-    { icon: <Trophy className="w-8 h-8" />, title: 'Level Up System', desc: 'Gain XP, unlock achievements, and compete on leaderboards.' },
-  ];
-
-  const stats = [
-    { number: '10K+', label: 'Active Learners', icon: <Users className="w-6 h-6" /> },
-    { number: '500+', label: 'Expert Courses', icon: <BookOpen className="w-6 h-6" /> },
-    { number: '50K+', label: 'XP Earned Daily', icon: <Zap className="w-6 h-6" /> },
-  ];
-
-  const gamificationFeatures = [
-    { icon: '🎮', title: 'Game-Like Experience', desc: 'Learn feels like playing your favorite game' },
-    { icon: '⚡', title: 'Instant Feedback', desc: 'Get real-time results and celebrate wins' },
-    { icon: '🏆', title: 'Achievements System', desc: 'Unlock badges and show off your progress' },
-    { icon: '📊', title: 'Track Everything', desc: 'Detailed analytics of your learning journey' },
-  ];
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-950 via-dark-900 to-dark-850">
-      {/* Navigation */}
-      <nav className="bg-dark-800/50 backdrop-blur-xl border-b border-dark-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <motion.div 
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className="flex items-center space-x-2"
-            >
-              <Zap className="w-8 h-8 text-accent-purple" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-accent-purple to-accent-pink bg-clip-text text-transparent">
-                LearnSphere
+    <div className="bg-dark-900 text-gray-100 overflow-x-hidden">
+
+      {/* 1. HERO SECTION */}
+      <section className="relative min-h-[90vh] flex items-center justify-center pt-20 px-4 overflow-hidden">
+        {/* Background Gradients */}
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-dark-900 via-dark-900 to-primary-900/20 z-0" />
+        <div className="absolute top-20 right-10 w-72 h-72 bg-accent-purple/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-primary-600/10 rounded-full blur-3xl animate-pulse delay-1000" />
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="mb-6">
+              <span className="inline-block py-1 px-3 rounded-full bg-primary-500/10 text-primary-400 text-sm font-medium border border-primary-500/20 mb-4">
+                🚀 The future of learning is here
+              </span>
+              <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-primary-100 to-primary-200">
+                A joyful way to learn <br /> and level up
               </h1>
             </motion.div>
-            <motion.div 
-              initial={{ x: 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className="flex items-center space-x-4"
-            >
-              <Link to="/auth" className="btn-ghost text-sm">
-                Sign In
+
+            <motion.p variants={fadeInUp} className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+              Master new skills with bite-sized lessons, interactive challenges, and game-like quizzes. Join a community of learners today.
+            </motion.p>
+
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+              <Link to="/register" className="btn-primary text-lg px-8 py-4 shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40 w-full sm:w-auto flex items-center justify-center gap-2">
+                Get Started <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link to="/register" className="btn-primary text-sm">
-                Start Learning →
+              <Link to="/courses" className="btn-secondary text-lg px-8 py-4 w-full sm:w-auto">
+                Browse Courses
               </Link>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
-      </nav>
+      </section>
 
-      {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <motion.div 
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring' }}
-            className="inline-block mb-4"
-          >
-            <span className="badge-level animate-pulse-slow">
-              🎮 Gaming-Inspired Learning Platform
-            </span>
-          </motion.div>
-          
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-primary-400 via-accent-purple to-accent-pink bg-clip-text text-transparent">
-              Level Up
-            </span>
-            <br />
-            <span className="text-white">Your Skills</span>
-          </h1>
-          
-          <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
-            Transform learning into an epic adventure. Earn XP, unlock achievements, 
-            climb leaderboards, and master new skills with our gamified platform.
-          </p>
-          
-          <div className="flex justify-center gap-4 flex-wrap">
-            <Link to="/register" className="btn-primary text-lg px-8 py-4">
-              <Zap className="w-5 h-5 inline mr-2" />
-              Start Free Journey
-            </Link>
-            <a href="#features" className="btn-secondary text-lg px-8 py-4">
-              <Star className="w-5 h-5 inline mr-2" />
-              Explore Features
-            </a>
-          </div>
-
-          {/* Hero Stats */}
-          <motion.div 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mt-12"
-          >
-            {stats.map((stat, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.05 }}
-                className="card-gradient p-4"
-              >
-                <div className="text-accent-purple mb-1">{stat.icon}</div>
-                <div className="text-2xl font-bold text-white">{stat.number}</div>
-                <div className="text-xs text-gray-400">{stat.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </motion.div>
-
-        {/* Features Section */}
-        <div id="features" className="mt-32">
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Why Learners <span className="text-accent-purple">Love Us</span>
-            </h2>
-            <p className="text-gray-400 text-lg">Everything you need to succeed, gamified</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, i) => (
-              <motion.div
-                key={i}
-                initial={{ y: 20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -10, scale: 1.02 }}
-                className="card-hover text-center"
-              >
-                <div className="text-accent-purple mb-4 flex justify-center">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-400">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
+      {/* 2. WHAT IS LEARNSPHERE */}
+      <section className="py-24 px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why choose LearnSphere?</h2>
+          <p className="text-gray-400 max-w-2xl mx-auto">We combine proven learning techniques with game mechanics to keep you motivated.</p>
         </div>
 
-        {/* Gamification Showcase */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-32 bg-gradient-to-r from-accent-purple/20 to-accent-pink/20 border border-accent-purple/30 rounded-3xl p-12"
-        >
-          <div className="text-center mb-12">
-            <Trophy className="w-16 h-16 text-accent-gold mx-auto mb-4 animate-float" />
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Learning That Feels Like <span className="text-accent-gold">Gaming</span>
-            </h2>
-            <p className="text-gray-300 text-lg">Not your average boring LMS</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {gamificationFeatures.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ scale: 0.9, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="card-solid text-center"
-              >
-                <div className="text-4xl mb-3">{item.icon}</div>
-                <h4 className="font-semibold text-white mb-2">{item.title}</h4>
-                <p className="text-sm text-gray-400">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* How It Works */}
-        <div className="mt-32">
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Your <span className="text-primary-400">Learning Journey</span>
-            </h2>
-            <p className="text-gray-400 text-lg">Four simple steps to mastery</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              { step: '1', title: 'Create Account', desc: 'Sign up for free', icon: '🚀' },
-              { step: '2', title: 'Choose Courses', desc: 'Pick your path', icon: '🎯' },
-              { step: '3', title: 'Earn XP', desc: 'Complete & level up', icon: '⚡' },
-              { step: '4', title: 'Get Certified', desc: 'Show your skills', icon: '🏆' },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ x: -20, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                className="relative"
-              >
-                <div className="card-gradient text-center">
-                  <div className="text-5xl mb-4">{item.icon}</div>
-                  <div className="text-3xl font-bold text-accent-purple mb-2">{item.step}</div>
-                  <h4 className="font-semibold text-white mb-2">{item.title}</h4>
-                  <p className="text-sm text-gray-400">{item.desc}</p>
-                </div>
-                {i < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                    <TrendingUp className="w-8 h-8 text-accent-purple/30" />
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-32 bg-gradient-gaming rounded-3xl p-12 text-center"
-        >
-          <Award className="w-16 h-16 text-white mx-auto mb-6 animate-float" />
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Ready to Start Your Epic Quest?
-          </h2>
-          <p className="text-white/90 mb-8 text-lg max-w-2xl mx-auto">
-            Join thousands of learners earning XP, unlocking achievements, and mastering new skills every day.
-          </p>
-          <Link to="/register" className="btn-primary text-lg px-10 py-4 bg-white text-purple-700 hover:bg-gray-100">
-            <Zap className="w-5 h-5 inline mr-2" />
-            Begin Adventure - It's Free!
-          </Link>
-          <p className="text-white/70 mt-4 text-sm">
-            Demo: learner1@learnsphere.com / password123
-          </p>
-        </motion.div>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-dark-950 border-t border-dark-800 py-12 mt-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Zap className="w-6 h-6 text-accent-purple" />
-                <h3 className="font-bold text-white">LearnSphere</h3>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {[
+            { icon: BookOpen, title: "Structured Learning", desc: "Curated paths from beginner to pro." },
+            { icon: Target, title: "Targeted Practice", desc: "Hands-on exercises that stick." },
+            { icon: Trophy, title: "Competitive Quizzes", desc: "Challenge friends and climb ranks." },
+            { icon: Zap, title: "Instant Feedback", desc: "Know where you stand immediately." }
+          ].map((feature, idx) => (
+            <motion.div
+              key={idx}
+              whileHover={{ y: -5 }}
+              className="p-6 rounded-2xl bg-dark-900 border border-dark-800 hover:border-primary-500/30 transition-all text-center group"
+            >
+              <div className="w-14 h-14 rounded-xl bg-dark-800 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-500/10 transition-colors">
+                <feature.icon className="w-7 h-7 text-primary-400 group-hover:text-primary-300" />
               </div>
-              <p className="text-gray-500 text-sm">
-                Gamified learning for the modern age.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#features" className="hover:text-white">Features</a></li>
-                <li><Link to="/auth" className="hover:text-white">Sign In</Link></li>
-                <li><Link to="/register" className="hover:text-white">Sign Up</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Features</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>XP & Levels</li>
-                <li>Achievements</li>
-                <li>Leaderboards</li>
-                <li>Progress Tracking</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Test Accounts</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>learner1@learnsphere.com</li>
-                <li>instructor@learnsphere.com</li>
-                <li>Password: password123</li>
-              </ul>
-            </div>
+              <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
+              <p className="text-sm text-gray-400">{feature.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. HOW IT WORKS */}
+      <section className="py-24 bg-dark-900 border-y border-dark-800">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">How it works</h2>
+            <div className="h-1 w-20 bg-primary-500 mx-auto rounded-full" />
           </div>
-          <div className="border-t border-dark-800 mt-8 pt-8 text-center text-sm text-gray-500">
-            <p>&copy; 2026 LearnSphere. Gamified learning redefined.</p>
+
+          <div className="grid md:grid-cols-4 gap-8 relative">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden md:block absolute top-12 left-[10%] right-[10%] h-0.5 bg-dark-700 -z-10" />
+
+            {[
+              { step: "01", title: "Learn", desc: "Pick a skill path." },
+              { step: "02", title: "Practice", desc: "Solve real problems." },
+              { step: "03", title: "Quiz", desc: "Test your knowledge." },
+              { step: "04", title: "Level Up", desc: "Earn badges & XP." }
+            ].map((item, idx) => (
+              <div key={idx} className="text-center relative bg-dark-900 md:bg-transparent p-4">
+                <div className="w-12 h-12 rounded-full bg-dark-800 border-2 border-primary-500/50 text-primary-400 flex items-center justify-center font-bold text-lg mx-auto mb-6 z-10 relative">
+                  {item.step}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-gray-400">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* 4. FEATURE PREVIEW */}
+      <section className="py-24 px-6 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-4">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-2">Explore Features</h2>
+            <p className="text-gray-400">Sneak peek into what you get.</p>
+          </div>
+          <Link to="/register" className="text-primary-400 hover:text-primary-300 flex items-center gap-1 font-medium">
+            View all features <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Course Card */}
+          <Link to="/register" className="group relative overflow-hidden rounded-2xl bg-dark-800 border border-dark-700 hover:border-primary-500/50 transition-all">
+            <div className="h-48 bg-gradient-to-br from-blue-900/20 to-purple-900/20 flex items-center justify-center">
+              <BookOpen className="w-16 h-16 text-blue-400/50 group-hover:scale-110 transition-transform" />
+            </div>
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">Interactive Courses</h3>
+              <p className="text-gray-400 text-sm">Rich content with video, text, and code editors built right in.</p>
+            </div>
+          </Link>
+
+          {/* Quiz Card */}
+          <Link to="/register" className="group relative overflow-hidden rounded-2xl bg-dark-800 border border-dark-700 hover:border-primary-500/50 transition-all">
+            <div className="h-48 bg-gradient-to-br from-yellow-900/20 to-orange-900/20 flex items-center justify-center">
+              <Brain className="w-16 h-16 text-yellow-400/50 group-hover:scale-110 transition-transform" />
+            </div>
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">Smart Quizzes</h3>
+              <p className="text-gray-400 text-sm">Adaptive questions that test your understanding, not just memory.</p>
+            </div>
+          </Link>
+
+          {/* Multiplayer Card */}
+          <Link to="/register" className="group relative overflow-hidden rounded-2xl bg-dark-800 border border-dark-700 hover:border-primary-500/50 transition-all md:col-span-2 lg:col-span-1">
+            <div className="h-48 bg-gradient-to-br from-green-900/20 to-emerald-900/20 flex items-center justify-center">
+              <Users className="w-16 h-16 text-green-400/50 group-hover:scale-110 transition-transform" />
+            </div>
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">Multiplayer Arena</h3>
+              <p className="text-gray-400 text-sm">Compete with friends in real-time quiz battles.</p>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* 5. WHY LEARNSPHERE / BENEFITS */}
+      <section className="py-24 bg-dark-900 border-y border-dark-800">
+        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-8">
+            <h2 className="text-3xl md:text-5xl font-bold leading-tight">
+              Designed for <span className="text-primary-400">retention</span>, not just completion.
+            </h2>
+            <p className="text-lg text-gray-400">
+              Most platforms focus on video hours. We focus on how much you actually remember. Our spaced repetition and gamification ensures long-term mastery.
+            </p>
+
+            <ul className="space-y-4">
+              {[
+                "Byte-sized lessons (< 15 mins)",
+                "Instant code validation",
+                "Peer-to-peer learning",
+                "Certificates of completion"
+              ].map((item, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-accent-gold" />
+                  <span className="text-gray-300">{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            <Link to="/register" className="btn-primary inline-flex items-center gap-2 mt-4">
+              Start Learning Now
+            </Link>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -inset-4 bg-gradient-to-r from-primary-500 to-accent-purple opacity-20 blur-2xl rounded-3xl" />
+            <div className="relative bg-dark-900 p-8 rounded-2xl border border-dark-800 shadow-2xl">
+              <div className="flex items-center gap-4 mb-6 border-b border-dark-800 pb-4">
+                <div className="w-12 h-12 rounded-full bg-dark-800 animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-4 w-32 bg-dark-800 rounded animate-pulse" />
+                  <div className="h-3 w-20 bg-dark-800 rounded animate-pulse" />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="h-24 bg-dark-800 rounded-lg animate-pulse" />
+                <div className="h-24 bg-dark-800 rounded-lg animate-pulse delay-100" />
+                <div className="h-24 bg-dark-800 rounded-lg animate-pulse delay-200" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. MULTIPLAYER PREVIEW SPECIFIC */}
+      <section className="py-24 px-6 max-w-5xl mx-auto text-center">
+        <div className="mb-10 inline-flex items-center justify-center p-4 rounded-full bg-accent-purple/10 text-accent-purple mb-6">
+          <Users className="w-8 h-8 mr-3" />
+          <span className="font-bold text-xl">Multiplayer Mode</span>
+        </div>
+        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          Learning is better together
+        </h2>
+        <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+          Create a room, invite your friends, and see who climbs the leaderboard faster. Real-time sync, instant results.
+        </p>
+
+        <div className="relative rounded-2xl overflow-hidden border border-dark-700 shadow-2xl bg-dark-900 p-8 md:p-12">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 via-accent-purple to-accent-gold" />
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 opacity-50 blur-[1px] hover:blur-none hover:opacity-100 transition-all duration-500">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 rounded-full bg-primary-600 mx-auto flex items-center justify-center text-2xl font-bold">JD</div>
+              <div className="font-mono text-primary-400">1200 XP</div>
+            </div>
+            <div className="text-2xl font-bold text-gray-600">VS</div>
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 rounded-full bg-accent-purple mx-auto flex items-center justify-center text-2xl font-bold">ME</div>
+              <div className="font-mono text-accent-purple">1150 XP</div>
+            </div>
+          </div>
+          <div className="mt-8">
+            <Link to="/login" className="btn-secondary">Play after signing in</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. FINAL CALL TO ACTION */}
+      <section className="py-32 px-6 text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-t from-primary-900/20 via-transparent to-transparent pointer-events-none" />
+
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Start learning the fun way</h2>
+          <p className="text-xl text-gray-400 mb-10">
+            Join thousands of learners who have switched to LearnSphere. No credit card required.
+          </p>
+          <Link to="/register" className="btn-primary text-xl px-10 py-5 shadow-xl shadow-primary-500/20 hover:scale-105 transition-transform">
+            Get Started for Free
+          </Link>
+          <p className="mt-6 text-sm text-gray-500">
+            Already have an account? <Link to="/login" className="text-primary-400 hover:underline">Sign in</Link>
+          </p>
+        </div>
+      </section>
+
     </div>
   );
 };

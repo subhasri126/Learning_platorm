@@ -7,15 +7,17 @@ import { verifyToken } from '../utils/jwt.js';
 export const authenticate = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
+    const headerToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
+    const queryToken = req.query?.token;
+    const altHeaderToken = req.headers['x-access-token'];
+    const token = headerToken || queryToken || altHeaderToken;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return res.status(401).json({
         success: false,
         message: 'Access denied. No token provided.',
       });
     }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     const decoded = verifyToken(token);
 
     if (!decoded) {
@@ -25,10 +27,12 @@ export const authenticate = (req, res, next) => {
       });
     }
 
+    const normalizedRole = decoded.role?.toLowerCase?.() || decoded.role;
+
     // Attach user info to request object
     req.user = {
       userId: decoded.userId,
-      role: decoded.role,
+      role: normalizedRole,
     };
 
     next();

@@ -33,9 +33,15 @@ export const register = async (req, res, next) => {
       });
     }
 
-    // Validate role (default to LEARNER if not provided)
-    const validRoles = ['ADMIN', 'INSTRUCTOR', 'LEARNER'];
-    const userRole = role && validRoles.includes(role) ? role : 'LEARNER';
+    // Normalize role (default to user if not provided)
+    let userRole = 'user';
+    if (role) {
+      const validRoles = ['admin', 'instructor', 'user'];
+      const normalizedRole = role.toLowerCase();
+      if (validRoles.includes(normalizedRole)) {
+        userRole = normalizedRole;
+      }
+    }
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -75,11 +81,8 @@ export const register = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'User registered successfully.',
-      data: {
-        user,
-        token,
-      },
+      token,
+      user,
     });
   } catch (error) {
     next(error);
@@ -92,13 +95,13 @@ export const register = async (req, res, next) => {
  */
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     // Validation
-    if (!email || !password) {
+    if (!email || !password || !role) {
       return res.status(400).json({
         success: false,
-        message: 'Email and password are required.',
+        message: 'Email, password, and role are required.',
       });
     }
 
@@ -124,6 +127,17 @@ export const login = async (req, res, next) => {
       });
     }
 
+    // Normalize roles for comparison
+    let requestedRole = role.toLowerCase();
+
+    // Verify Role
+    if (user.role !== requestedRole) {
+      return res.status(401).json({
+        success: false,
+        message: `Role mismatch. You are registered as ${user.role}, not ${requestedRole}.`,
+      });
+    }
+
     // Generate token
     const token = generateToken(user.id, user.role);
 
@@ -132,11 +146,8 @@ export const login = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: 'Login successful.',
-      data: {
-        user: userWithoutPassword,
-        token,
-      },
+      token,
+      user: userWithoutPassword,
     });
   } catch (error) {
     next(error);

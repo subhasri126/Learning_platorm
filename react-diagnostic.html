@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Test - Is React Working?</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .box {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid #3b82f6;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        .success {
+            color: #10b981;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
+        .warning {
+            color: #f59e0b;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 React App Diagnostic</h1>
+
+    <div class="box">
+        <h2>Current Status</h2>
+        <p>The courses page is returning HTTP 200 but only 602 bytes.</p>
+        <p>This means the HTML shell loads, but React is not rendering.</p>
+        <p><strong class="error">This indicates a JavaScript error is crashing the React app.</strong></p>
+    </div>
+
+    <div class="box">
+        <h2>What To Do</h2>
+        <ol>
+            <li><strong>Open Browser Console</strong>
+                <ul>
+                    <li>Press <code>F12</code></li>
+                    <li>Click "Console" tab</li>
+                    <li>Look for RED error messages</li>
+                </ul>
+            </li>
+            <li><strong>Go to any page</strong>
+                <ul>
+                    <li><code>http://localhost:3000</code></li>
+                    <li><code>http://localhost:3000/courses</code></li>
+                    <li><code>http://localhost:3000/dashboard</code></li>
+                </ul>
+            </li>
+            <li><strong>Check what error appears</strong>
+                <ul>
+                    <li>Copy the error message</li>
+                    <li>Tell me what it says</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="box">
+        <h2>Quick Tests</h2>
+        <button onclick="testHomepage()">Test Homepage</button>
+        <button onclick="testCourses()">Test Courses Page</button>
+        <button onclick="testAPI()">Test Backend API</button>
+        <div id="results" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="box">
+        <h2>Most Likely Issues</h2>
+        <h3 class="warning">1. Vite Hasn't Rebuilt Yet</h3>
+        <p>Solution: Wait 10 seconds, then hard refresh (Ctrl + Shift + R)</p>
+
+        <h3 class="warning">2. Import Error</h3>
+        <p>One of the imports in CourseForm.jsx might be failing</p>
+        <p>Check console for: <code>Failed to resolve module</code></p>
+
+        <h3 class="warning">3. Syntax Error</h3>
+        <p>There might be a subtle syntax error in the JSX</p>
+        <p>Check console for: <code>Unexpected token</code></p>
+
+        <h3 class="warning">4. Component Error</h3>
+        <p>A component might be throwing an error during render</p>
+        <p>Check console for: <code>Cannot read property</code></p>
+    </div>
+
+    <div class="box">
+        <h2>What I Need From You</h2>
+        <p><strong>Please do this:</strong></p>
+        <ol>
+            <li>Go to: <code>http://localhost:3000</code></li>
+            <li>Press <code>F12</code> (open DevTools)</li>
+            <li>Click "Console" tab</li>
+            <li>Take a screenshot or copy the error messages</li>
+            <li>Tell me what you see</li>
+        </ol>
+        <p><strong class="success">Once I know the exact error, I can fix it immediately!</strong></p>
+    </div>
+
+    <div class="box">
+        <h2>Expected Console Errors</h2>
+        <p>You might see one of these:</p>
+        <pre>
+❌ Failed to resolve module specifier "lucide-react"
+❌ Unexpected token '<'
+❌ Cannot read property 'map' of undefined
+❌ X is not defined
+❌ Failed to compile
+❌ Module not found
+        </pre>
+    </div>
+
+    <script>
+        function testHomepage() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing homepage...</p>';
+
+            fetch('http://localhost:3000')
+                .then(response => {
+                    results.innerHTML = `
+                        <p class="success">✅ Status: ${response.status}</p>
+                        <p>Content-Type: ${response.headers.get('content-type')}</p>
+                        <p>If status is 200 but page is blank, check browser console for JS errors!</p>
+                    `;
+                })
+                .catch(error => {
+                    results.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                });
+        }
+
+        function testCourses() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing courses page...</p>';
+
+            fetch('http://localhost:3000/courses')
+                .then(response => response.text())
+                .then(html => {
+                    results.innerHTML = `
+                        <p class="success">✅ Page loaded</p>
+                        <p>Content length: ${html.length} bytes</p>
+                        ${html.length < 1000 ? '<p class="error">⚠️ Content too small - likely blank page!</p>' : '<p class="success">✅ Has content</p>'}
+                        <p><strong>Check browser console for JavaScript errors!</strong></p>
+                    `;
+                })
+                .catch(error => {
+                    results.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                });
+        }
+
+        function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing backend API...</p>';
+
+            fetch('http://localhost:5000/api/courses')
+                .then(response => response.json())
+                .then(data => {
+                    results.innerHTML = `
+                        <p class="success">✅ Backend is running!</p>
+                        <p>Courses found: ${data.data ? data.data.length : 0}</p>
+                    `;
+                })
+                .catch(error => {
+                    results.innerHTML = `<p class="warning">⚠️ ${error.message} (This is OK if you're not logged in)</p>`;
+                });
+        }
+    </script>
+</body>
+
+</html>

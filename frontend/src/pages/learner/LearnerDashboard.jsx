@@ -5,14 +5,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import { progressAPI } from '../../api/progress.api';
 import { Zap, Trophy, Target, BookOpen, TrendingUp, Award, Star, MessageCircle } from 'lucide-react';
 import { calculateLevel, calculateLevelProgress, getRank, formatXP } from '../../utils/gamification';
-import LearnerNavbar from '../../components/learner/LearnerNavbar';
-import MascotGuide from '../../components/learner/MascotGuide';
+
 
 const LearnerDashboard = () => {
   const { user } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showMascot, setShowMascot] = useState(true);
+
 
   useEffect(() => {
     fetchDashboard();
@@ -42,10 +41,18 @@ const LearnerDashboard = () => {
   const levelProgress = calculateLevelProgress(totalXP);
   const rank = getRank(totalXP);
   const stats = dashboardData?.stats || {};
+  const suggestedCourses = [
+    { title: 'JavaScript Basics', description: 'Build confidence with core JS concepts.', difficulty: 'Beginner', duration: '2h 30m', xp: 180, status: 'Start' },
+    { title: 'Advanced JavaScript', description: 'Master closures, async, and performance.', difficulty: 'Advanced', duration: '3h 45m', xp: 260, status: 'Start' },
+    { title: 'Python Fundamentals', description: 'Learn Python for real-world automation.', difficulty: 'Beginner', duration: '3h', xp: 210, status: 'Start' },
+    { title: 'Web Development (Frontend)', description: 'HTML, CSS, and responsive UI foundations.', difficulty: 'Intermediate', duration: '4h', xp: 280, status: 'Start' },
+    { title: 'Web Development (Backend)', description: 'APIs, servers, and authentication basics.', difficulty: 'Intermediate', duration: '4h 30m', xp: 300, status: 'Start' },
+    { title: 'MySQL & Databases', description: 'Queries, joins, and data modeling essentials.', difficulty: 'Beginner', duration: '2h 45m', xp: 190, status: 'Start' },
+    { title: 'Computer Fundamentals', description: 'Understand OS, memory, and networks.', difficulty: 'Beginner', duration: '2h', xp: 150, status: 'Start' }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-850">
-      <LearnerNavbar />
+    <div className="bg-gradient-to-br from-dark-950 via-dark-900 to-dark-850">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section with Mascot */}
@@ -61,7 +68,7 @@ const LearnerDashboard = () => {
               </h1>
               <p className="text-gray-400">Ready to continue your learning adventure?</p>
             </div>
-            
+
             {/* Level Badge */}
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -97,7 +104,7 @@ const LearnerDashboard = () => {
               <span>{rank.name}</span>
             </div>
           </div>
-          
+
           <div className="xp-bar">
             <motion.div
               initial={{ width: 0 }}
@@ -106,7 +113,7 @@ const LearnerDashboard = () => {
               className="xp-fill"
             />
           </div>
-          
+
           <div className="flex justify-between mt-2 text-xs text-gray-500">
             <span>Level {level}</span>
             <span>{Math.round(levelProgress)}% to Level {level + 1}</span>
@@ -187,11 +194,11 @@ const LearnerDashboard = () => {
                       <span className="badge badge-info">{course.status.replace('_', ' ')}</span>
                       <span className="text-2xl">{course.progress >= 100 ? '🏆' : '📚'}</span>
                     </div>
-                    
+
                     <h3 className="text-lg font-semibold text-white mb-2 line-clamp-2">
                       {course.title}
                     </h3>
-                    
+
                     <div className="progress-bar mb-2">
                       <motion.div
                         initial={{ width: 0 }}
@@ -200,7 +207,7 @@ const LearnerDashboard = () => {
                         className="progress-fill"
                       />
                     </div>
-                    
+
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">{Math.round(course.progress)}% Complete</span>
                       {course.progress >= 100 && (
@@ -227,6 +234,36 @@ const LearnerDashboard = () => {
           )}
         </div>
 
+        {/* Suggested Courses */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <BookOpen className="w-6 h-6 text-accent-purple" />
+              Suggested Courses
+            </h2>
+            <Link to="/courses" className="btn-secondary text-sm">
+              Explore All
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {suggestedCourses.map((course) => (
+              <div key={course.title} className="card-hover">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-gray-400">{course.difficulty}</span>
+                  <span className="text-xs text-gray-400">⚡ {course.xp} XP</span>
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-1">{course.title}</h3>
+                <p className="text-sm text-gray-400 mb-3 line-clamp-2">{course.description}</p>
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>⏱️ {course.duration}</span>
+                  <span>{course.status}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Recent Quiz Attempts */}
         {dashboardData?.recentQuizAttempts?.length > 0 && (
           <div>
@@ -234,7 +271,7 @@ const LearnerDashboard = () => {
               <Target className="w-6 h-6 text-accent-purple" />
               Recent Quizzes
             </h2>
-            
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {dashboardData.recentQuizAttempts.map((attempt, index) => (
                 <motion.div
@@ -246,25 +283,38 @@ const LearnerDashboard = () => {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-400">Attempt #{attempt.attemptNumber}</span>
-                    <span className="text-2xl">{attempt.percentage >= 80 ? '🎉' : attempt.percentage >= 60 ? '👍' : '💪'}</span>
+                    {(() => {
+                      const max = attempt.quizMaxPoints || attempt.maxPoints || 0;
+                      const pct = max ? (attempt.score / max) * 100 : 0;
+                      return <span className="text-2xl">{pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '💪'}</span>;
+                    })()}
                   </div>
-                  
+
                   <div className="text-2xl font-bold text-white mb-1">
                     {attempt.score} / {attempt.quizMaxPoints}
                   </div>
-                  
+
                   <div className="text-sm text-gray-400 mb-3">
-                    {Math.round(attempt.percentage)}% Score
+                    {(() => {
+                      const max = attempt.quizMaxPoints || attempt.maxPoints || 0;
+                      const pct = max ? Math.round((attempt.score / max) * 100) : 0;
+                      return `${pct}% Score`;
+                    })()}
                   </div>
-                  
+
                   <div className="progress-bar h-2">
-                    <div
-                      className={`h-full rounded-full ${
-                        attempt.percentage >= 80 ? 'bg-green-500' :
-                        attempt.percentage >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}
-                      style={{ width: `${attempt.percentage}%` }}
-                    />
+                    {(() => {
+                      const max = attempt.quizMaxPoints || attempt.maxPoints || 0;
+                      const pct = max ? (attempt.score / max) * 100 : 0;
+                      return (
+                        <div
+                          className={`h-full rounded-full ${pct >= 80 ? 'bg-green-500' :
+                            pct >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                            }`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      );
+                    })()}
                   </div>
                 </motion.div>
               ))}
@@ -273,16 +323,7 @@ const LearnerDashboard = () => {
         )}
       </div>
 
-      {/* Mascot Guide */}
-      <AnimatePresence>
-        {showMascot && (
-          <MascotGuide
-            emoji="👋"
-            message="Hey! Ready to learn something new today?"
-            onClose={() => setShowMascot(false)}
-          />
-        )}
-      </AnimatePresence>
+
     </div>
   );
 };

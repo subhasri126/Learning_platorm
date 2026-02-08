@@ -61,7 +61,7 @@ const QuizAttempt = () => {
 
   const handleAnswerChange = (questionId, answer) => {
     setError('');
-    setAnswers({ ...answers, [questionId]: answer });
+    setAnswers((prev) => ({ ...prev, [String(questionId)]: answer }));
   };
 
   const totalQuestions = quiz?.questions?.length || 0;
@@ -158,15 +158,15 @@ const QuizAttempt = () => {
 
     const handleVisibilityChange = () => {
       if (!document.hidden) return;
-      setTabSwitchCount((prev) => {
-        const next = prev + 1;
-        if (next >= 2) {
-          triggerInterruption();
-        } else {
-          showOverlay('You’re in the middle of a quiz. Please stay on this tab to continue.', '⚠️');
-        }
-        return next;
-      });
+        setTabSwitchCount((prev) => {
+          const next = prev + 1;
+          if (next >= 2) {
+            triggerInterruption();
+          } else {
+            showOverlay('You are in the middle of a quiz. Please stay on this tab to continue.', '⚠️');
+          }
+          return next;
+        });
     };
 
     window.history.pushState(null, '', window.location.href);

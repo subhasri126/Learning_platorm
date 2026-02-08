@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Upload Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .container {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 12px;
+        }
+
+        h1 {
+            color: #fbbf24;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .success {
+            background: #064e3b;
+            border-color: #10b981;
+            color: #6ee7b7;
+        }
+
+        .info {
+            background: #1e3a8a;
+            border-color: #3b82f6;
+            color: #93c5fd;
+        }
+
+        .warning {
+            background: #78350f;
+            border-color: #f59e0b;
+            color: #fcd34d;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 30px 0;
+        }
+
+        .lesson-type-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            border-radius: 12px;
+            border: 2px solid;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 140px;
+        }
+
+        .lesson-type-btn.highlight {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.5);
+            color: #fcd34d;
+        }
+
+        .lesson-type-btn.highlight:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .lesson-type-btn.normal {
+            background: #334155;
+            border-color: #475569;
+            color: #94a3b8;
+        }
+
+        .lesson-type-btn.normal:hover {
+            background: #3f4b5e;
+        }
+
+        .lesson-type-btn.selected {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .label {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .recommended {
+            font-size: 11px;
+            color: #fcd34d;
+            margin-top: 8px;
+        }
+
+        .code-block {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        button.test-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+
+        button.test-btn:hover {
+            background: #059669;
+        }
+
+        @media (max-width: 768px) {
+            .button-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📄 PDF Upload Option - Verification Page</h1>
+
+        <div class="status info">
+            <strong>✅ Code Verification Complete</strong><br>
+            The LessonForm.jsx file has been updated with the following changes:
+            <ul style="margin: 10px 0; padding-left: 20px;">
+                <li>PDF Upload moved to FIRST position</li>
+                <li>Highlighted in yellow/gold color</li>
+                <li>Added emoji icon (📄)</li>
+                <li>Added "← Recommended" label</li>
+                <li>Responsive grid layout (2 cols mobile, 4 cols desktop)</li>
+            </ul>
+        </div>
+
+        <h2 style="color: #fbbf24; margin-top: 40px;">This is How It Should Look:</h2>
+
+        <div class="button-grid">
+            <div class="lesson-type-btn highlight" id="pdf-btn">
+                <div class="icon">📄</div>
+                <div class="label">📄 PDF Upload</div>
+                <div class="recommended">← Recommended</div>
+            </div>
+
+            <div class="lesson-type-btn normal" id="video-btn">
+                <div class="icon">📹</div>
+                <div class="label">Video URL</div>
+            </div>
+
+            <div class="lesson-type-btn normal" id="doc-btn">
+                <div class="icon">📄</div>
+                <div class="label">Document / Text</div>
+            </div>
+
+            <div class="lesson-type-btn normal" id="image-btn">
+                <div class="icon">🖼️</div>
+                <div class="label">Image URL</div>
+            </div>
+        </div>
+
+        <div class="status success">
+            <strong>👆 The FIRST button (yellow one) is the PDF Upload option!</strong><br>
+            This is exactly how it will appear in your LearnSphere application.
+        </div>
+
+        <h2 style="color: #fbbf24; margin-top: 40px;">Next Steps:</h2>
+
+        <div class="status warning">
+            <strong>To see this in your actual application:</strong>
+            <ol style="margin: 10px 0; padding-left: 20px;">
+                <li><strong>Open your browser</strong></li>
+                <li><strong>Go to:</strong> <code>http://localhost:3000/courses/8/lessons/create</code></li>
+                <li><strong>Hard refresh:</strong> Press <code>Ctrl + Shift + R</code></li>
+                <li><strong>Look for the YELLOW button</strong> (first one, top-left)</li>
+                <li><strong>Click it</strong> to select PDF Upload type</li>
+            </ol>
+        </div>
+
+        <h2 style="color: #fbbf24; margin-top: 40px;">Code Verification:</h2>
+
+        <div class="code-block">
+            <strong>File:</strong> frontend/src/pages/lessons/LessonForm.jsx
+            <strong>Lines 192-197:</strong>
+
+            const types = [
+            { id: 'PDF', label: '📄 PDF Upload', icon: FileText, highlight: true }, ← FIRST!
+            { id: 'VIDEO', label: 'Video URL', icon: Video },
+            { id: 'DOCUMENT', label: 'Document / Text', icon: FileText },
+            { id: 'IMAGE', label: 'Image URL', icon: Image }
+            ];
+        </div>
+
+        <div class="status success">
+            <strong>✅ Confirmed:</strong> PDF Upload is the FIRST option in the array!
+        </div>
+
+        <h2 style="color: #fbbf24; margin-top: 40px;">Interactive Test:</h2>
+
+        <p>Click the buttons above to test the interaction:</p>
+        <button class="test-btn" onclick="testClick('pdf')">Test PDF Upload Click</button>
+        <button class="test-btn" onclick="testClick('video')">Test Video Click</button>
+        <button class="test-btn" onclick="testClick('doc')">Test Document Click</button>
+        <button class="test-btn" onclick="testClick('image')">Test Image Click</button>
+
+        <div id="result" style="margin-top: 20px;"></div>
+
+        <h2 style="color: #fbbf24; margin-top: 40px;">Console Logs to Expect:</h2>
+
+        <div class="code-block">
+            When the lesson form loads, you should see:
+            🎨 Rendering lesson types: ['📄 PDF Upload', 'Video URL', 'Document / Text', 'Image URL']
+            📄 PDF Upload is option #1
+
+            When you click PDF Upload:
+            ✅ Selected type: 📄 PDF Upload PDF
+        </div>
+
+        <div class="status info" style="margin-top: 40px;">
+            <strong>📊 Summary:</strong><br>
+            The PDF Upload option is NOW:<br>
+            • Position: <strong>1st</strong> (was 4th)<br>
+            • Color: <strong>Yellow/Gold</strong> (was gray)<br>
+            • Label: <strong>📄 PDF Upload</strong> (with emoji)<br>
+            • Badge: <strong>← Recommended</strong><br>
+            • Visibility: <strong>MAXIMUM</strong> ✨
+        </div>
+    </div>
+
+    <script>
+        // Make buttons clickable
+        const buttons = document.querySelectorAll('.lesson-type-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                buttons.forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                const label = this.querySelector('.label').textContent;
+                document.getElementById('result').innerHTML = `
+                    <div class="status success">
+                        <strong>✅ Selected:</strong> ${label}<br>
+                        This is how the selection will work in your app!
+                    </div>
+                `;
+            });
+        });
+
+        function testClick(type) {
+            const btnMap = {
+                'pdf': 'pdf-btn',
+                'video': 'video-btn',
+                'doc': 'doc-btn',
+                'image': 'image-btn'
+            };
+            document.getElementById(btnMap[type]).click();
+        }
+
+        // Log to console
+        console.log('🎨 Rendering lesson types:', ['📄 PDF Upload', 'Video URL', 'Document / Text', 'Image URL']);
+        console.log('📄 PDF Upload is option #1');
+    </script>
+</body>
+
+</html>

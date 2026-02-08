@@ -14,10 +14,10 @@ const router = express.Router();
 router.get('/leaderboard', authenticate, getLeaderboard);
 
 // Admin only routes
-router.get('/', authenticate, authorize('ADMIN'), getAllUsers);
-router.get('/:id', authenticate, authorize('ADMIN'), getUserById);
+router.get('/', authenticate, authorize('admin'), getAllUsers);
+router.get('/:id', authenticate, authorize('admin'), getUserById);
 
 // Instructor/Admin routes
-router.get('/courses/:courseId/stats', authenticate, authorize('INSTRUCTOR', 'ADMIN'), getCourseStats);
+router.get('/courses/:courseId/stats', authenticate, authorize('instructor', 'admin'), getCourseStats);
 
 export default router;

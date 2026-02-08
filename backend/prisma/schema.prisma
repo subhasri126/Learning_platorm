@@ -7,12 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  INSTRUCTOR
-  LEARNER
-}
-
 enum LessonType {
   VIDEO
   DOCUMENT
@@ -24,7 +18,7 @@ model User {
   email     String   @unique
   password  String
   name      String
-  role      Role     @default(LEARNER)
+  role      String   @default("user")
   totalPoints Int    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -57,16 +51,18 @@ model Course {
 }
 
 model Lesson {
-  id          Int        @id @default(autoincrement())
-  title       String
-  description String?    @db.Text
-  content     String     // URL or file path
-  type        LessonType
-  order       Int
-  duration    Int?       // Duration in minutes
-  courseId    Int
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id                Int        @id @default(autoincrement())
+  title             String
+  unitTitle         String?    @db.VarChar(255)
+  description       String?    @db.Text
+  content           String     // URL or file path
+  structuredContent Json?      // Extracted content for PDFs
+  type              LessonType
+  order             Int
+  duration          Int?       // Duration in minutes
+  courseId          Int
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   // Relations
   course   Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)

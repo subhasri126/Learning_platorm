@@ -6,5 +6,6 @@ export const quizAPI = {
   create: (data) => axios.post('/quizzes', data),
   addQuestion: (quizId, data) => axios.post(`/quizzes/${quizId}/questions`, data),
   submitAttempt: (quizId, answers) => axios.post(`/quizzes/${quizId}/attempt`, { answers }),
-  getAttempts: (quizId) => axios.get(`/quizzes/${quizId}/attempts`)
+  getAttempts: (quizId) => axios.get(`/quizzes/${quizId}/attempts`),
+  scoreAttempt: (quizId, answers) => axios.post(`/quizzes/${quizId}/score`, { answers })
 };

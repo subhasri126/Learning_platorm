@@ -8,7 +8,8 @@ import MascotGuide from '../../components/learner/MascotGuide';
 
 const CourseList = () => {
   const { isInstructor, isAdmin, isLearner } = useAuth();
-  const [courses, setCourses] = useState([]);
+  const [allCourses, setAllCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,9 +20,17 @@ const CourseList = () => {
 
   const fetchCourses = async () => {
     try {
+      console.log('🔍 Fetching courses...');
       const response = await courseAPI.getAll();
-      setCourses(response.data.data);
+      console.log('📦 API Response:', response);
+      console.log('📊 Response data:', response.data);
+      const data = Array.isArray(response.data.data) ? response.data.data : [];
+      console.log('✅ Courses array:', data);
+      console.log('📈 Number of courses:', data.length);
+      setAllCourses(data);
     } catch (err) {
+      console.error('❌ Error fetching courses:', err);
+      console.error('❌ Error response:', err.response);
       setError('Failed to load courses');
     } finally {
       setLoading(false);
@@ -49,12 +58,14 @@ const CourseList = () => {
   const getStatus = (course) => {
     const progress = course.progress ?? course.userProgress ?? 0;
     if (progress >= 100) return 'Completed';
-    if (progress > 0) return 'In progress';
-    return 'Not started';
+    if (progress > 0) return 'Continue';
+    return 'Start';
   };
 
   const getCategoryTags = (course) => {
-    const text = `${course.title} ${course.description || ''}`.toLowerCase();
+    const title = (course.title || '').toLowerCase();
+    const description = (course.description || '').toLowerCase();
+    const text = `${title} ${description}`;
     const tags = [];
 
     if (text.includes('javascript') || text.includes('js')) tags.push('JavaScript', 'Programming');
@@ -84,23 +95,152 @@ const CourseList = () => {
     return { difficulty, duration, xpPreview, status, tags };
   };
 
+  const curatedCourses = [
+    {
+      id: 'curated-js-basics',
+      title: 'JavaScript Basics',
+      description: 'Learn variables, functions, and DOM essentials.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 6, quizzes: 2 },
+      userProgress: 0
+    },
+    {
+      id: 'curated-js-advanced',
+      title: 'Advanced JavaScript',
+      description: 'Closures, async patterns, and performance tips.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 11, quizzes: 3 },
+      userProgress: 0
+    },
+    {
+      id: 'curated-python-fundamentals',
+      title: 'Python Fundamentals',
+      description: 'Write clean Python code for automation and data tasks.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 8, quizzes: 2 },
+      userProgress: 0
+    },
+    {
+      id: 'curated-web-frontend',
+      title: 'Web Development – Frontend',
+      description: 'HTML, CSS, and responsive UI foundations.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 10, quizzes: 2 },
+      userProgress: 0
+    },
+    {
+      id: 'curated-web-backend',
+      title: 'Web Development – Backend',
+      description: 'Build APIs, handle auth, and connect databases.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 9, quizzes: 2 },
+      userProgress: 0
+    },
+    {
+      id: 'curated-fullstack',
+      title: 'Full Stack Development',
+      description: 'Ship complete apps with frontend + backend workflows.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 12, quizzes: 3 },
+      userProgress: 0
+    },
+    {
+      id: 'curated-mysql',
+      title: 'MySQL & Databases',
+      description: 'Queries, joins, and schema design essentials.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 7, quizzes: 2 },
+      userProgress: 0
+    },
+    {
+      id: 'curated-fundamentals',
+      title: 'Computer Fundamentals',
+      description: 'Understand OS, memory, files, and networking basics.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 5, quizzes: 1 },
+      userProgress: 0
+    },
+    {
+      id: 'curated-data-structures',
+      title: 'Data Structures Basics',
+      description: 'Arrays, stacks, queues, and linked lists explained.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 9, quizzes: 2 },
+      userProgress: 0
+    },
+    {
+      id: 'curated-logic',
+      title: 'Programming Logic & Problem Solving',
+      description: 'Build reasoning skills with step-by-step challenges.',
+      isPublished: true,
+      instructor: { name: 'LearnSphere' },
+      _count: { lessons: 6, quizzes: 2 },
+      userProgress: 0
+    }
+  ];
+
+  const expandedCourses = useMemo(() => {
+    console.log('🔄 Computing expandedCourses...');
+    console.log('   isLearner:', isLearner);
+    console.log('   allCourses.length:', allCourses.length);
+
+    if (!isLearner) {
+      console.log('   → Returning allCourses (not a learner)');
+      return allCourses;
+    }
+
+    if (allCourses.length >= 8) {
+      console.log('   → Returning allCourses (>= 8 courses)');
+      return allCourses;
+    }
+
+    const existingTitles = new Set(allCourses.map((course) => course.title));
+    const missing = curatedCourses.filter((course) => !existingTitles.has(course.title));
+    console.log('   → Adding', missing.length, 'curated courses');
+    console.log('   → Total courses:', allCourses.length + missing.length);
+    return [...allCourses, ...missing];
+  }, [allCourses, isLearner]);
+
   const decoratedCourses = useMemo(() =>
-    courses.map((course) => ({
+    expandedCourses.map((course) => ({
       ...course,
       meta: getCourseMeta(course)
     })),
-    [courses]
+    [expandedCourses]
   );
 
-  const filteredCourses = useMemo(() => {
-    if (!searchTerm.trim()) return decoratedCourses;
+  useEffect(() => {
+    console.log('🔍 Filtering courses...');
+    console.log('   searchTerm:', searchTerm);
+    console.log('   decoratedCourses.length:', decoratedCourses.length);
+
+    if (!searchTerm.trim()) {
+      console.log('   → No search term, showing all decorated courses');
+      setFilteredCourses(decoratedCourses);
+      return;
+    }
+
     const term = searchTerm.toLowerCase();
-    return decoratedCourses.filter((course) => {
-      const text = `${course.title} ${course.description || ''}`.toLowerCase();
-      const tags = course.meta.tags.join(' ').toLowerCase();
-      const difficulty = course.meta.difficulty.toLowerCase();
+    const filtered = decoratedCourses.filter((course) => {
+      const title = (course.title || '').toLowerCase();
+      const description = (course.description || '').toLowerCase();
+      const text = `${title} ${description}`;
+      const tags = (course.meta?.tags || []).join(' ').toLowerCase();
+      const difficulty = (course.meta?.difficulty || '').toLowerCase();
       return text.includes(term) || tags.includes(term) || difficulty.includes(term);
     });
+
+    console.log('   → Filtered to', filtered.length, 'courses');
+    setFilteredCourses(filtered);
   }, [decoratedCourses, searchTerm]);
 
   const featuredCourses = useMemo(() => filteredCourses.slice(0, 3), [filteredCourses]);
@@ -190,6 +330,9 @@ const CourseList = () => {
                           <span key={tag} className="px-2 py-1 rounded-full bg-dark-700/70">{tag}</span>
                         ))}
                       </div>
+                      <div className="mt-4 flex justify-end">
+                        <span className="btn-primary text-xs px-4 py-2">{course.meta.status}</span>
+                      </div>
                     </Link>
                   );
                 })}
@@ -222,6 +365,9 @@ const CourseList = () => {
                         {course.meta.tags.slice(0, 3).map((tag) => (
                           <span key={tag} className="px-2 py-1 rounded-full bg-dark-700/70">{tag}</span>
                         ))}
+                      </div>
+                      <div className="mt-4 flex justify-end">
+                        <span className="btn-primary text-xs px-4 py-2">{course.meta.status}</span>
                       </div>
                     </Link>
                   );
@@ -256,6 +402,9 @@ const CourseList = () => {
                           <span key={tag} className="px-2 py-1 rounded-full bg-dark-700/70">{tag}</span>
                         ))}
                       </div>
+                      <div className="mt-4 flex justify-end">
+                        <span className="btn-primary text-xs px-4 py-2">{course.meta.status}</span>
+                      </div>
                     </Link>
                   );
                 })}
@@ -289,6 +438,9 @@ const CourseList = () => {
                           <span key={tag} className="px-2 py-1 rounded-full bg-dark-700/70">{tag}</span>
                         ))}
                       </div>
+                      <div className="mt-4 flex justify-end">
+                        <span className="btn-primary text-xs px-4 py-2">{course.meta.status}</span>
+                      </div>
                     </Link>
                   );
                 })}
@@ -300,15 +452,24 @@ const CourseList = () => {
             <h2 className="text-xl font-semibold text-white mb-4">All Courses</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCourses.map((course) => (
-                <CourseCard key={course.id} course={course} meta={course.meta} />
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  meta={course.meta}
+                  isInstructor={isInstructor || isAdmin}
+                />
               ))}
             </div>
           </section>
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-400 text-lg">No courses found.</p>
-          {(isInstructor || isAdmin) && (
+          {allCourses.length > 0 ? (
+            <p className="text-gray-400 text-lg">No courses found.</p>
+          ) : (
+            <p className="text-gray-400 text-lg">No courses available yet.</p>
+          )}
+          {(isInstructor || isAdmin) && allCourses.length === 0 && (
             <Link to="/courses/create" className="btn-primary mt-4 inline-block">
               Create Your First Course
             </Link>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Test - Check if Frontend is Running</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .test-box {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .success {
+            border-left: 4px solid #10b981;
+        }
+
+        .error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 Frontend Diagnostic Test</h1>
+
+    <div class="test-box warning">
+        <h2>Issue: Blank Page on /courses</h2>
+        <p>The courses page is showing a blank screen. This usually means:</p>
+        <ul>
+            <li>JavaScript error crashing React</li>
+            <li>Missing import or syntax error</li>
+            <li>Component rendering issue</li>
+        </ul>
+    </div>
+
+    <div class="test-box">
+        <h2>Quick Tests</h2>
+        <button onclick="testFrontend()">Test Frontend Server</button>
+        <button onclick="testAPI()">Test Backend API</button>
+        <button onclick="testCourses()">Test Courses API</button>
+        <button onclick="openConsole()">Open Browser Console</button>
+        <div id="results" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Manual Checks</h2>
+        <ol>
+            <li><strong>Check Frontend Server:</strong>
+                <pre>http://localhost:3000</pre>
+                Should show the homepage
+            </li>
+            <li><strong>Check Dashboard:</strong>
+                <pre>http://localhost:3000/dashboard</pre>
+                Does this load? If yes, only /courses is broken
+            </li>
+            <li><strong>Check Browser Console:</strong>
+                <ul>
+                    <li>Press F12</li>
+                    <li>Go to Console tab</li>
+                    <li>Look for RED errors</li>
+                    <li>Copy the error message</li>
+                </ul>
+            </li>
+            <li><strong>Check Network Tab:</strong>
+                <ul>
+                    <li>Press F12</li>
+                    <li>Go to Network tab</li>
+                    <li>Refresh /courses page</li>
+                    <li>Look for failed requests (red)</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="test-box error">
+        <h2>Most Likely Cause</h2>
+        <p><strong>I just added PDF upload code to CourseForm.jsx</strong></p>
+        <p>This might have introduced a syntax error or import issue.</p>
+        <h3>Solution:</h3>
+        <p>I'll create a fixed version of the CourseForm without the PDF feature first, then add it back properly.</p>
+    </div>
+
+    <div class="test-box success">
+        <h2>Temporary Workaround</h2>
+        <p>While I fix the issue, you can access courses via:</p>
+        <ul>
+            <li><a href="http://localhost:3000/dashboard" style="color: #60a5fa;">Dashboard</a> → Click on courses</li>
+            <li>Direct course links:
+                <ul>
+                    <li><a href="http://localhost:3000/courses/6" style="color: #60a5fa;">Course 6</a></li>
+                    <li><a href="http://localhost:3000/courses/7" style="color: #60a5fa;">Course 7</a></li>
+                    <li><a href="http://localhost:3000/courses/8" style="color: #60a5fa;">Course 8</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        function testFrontend() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing frontend server...</p>';
+
+            fetch('http://localhost:3000')
+                .then(response => {
+                    if (response.ok) {
+                        results.innerHTML = '<p style="color: #10b981;">✅ Frontend server is running!</p>';
+                    } else {
+                        results.innerHTML = '<p style="color: #ef4444;">❌ Frontend server returned error: ' + response.status + '</p>';
+                    }
+                })
+                .catch(error => {
+                    results.innerHTML = '<p style="color: #ef4444;">❌ Cannot connect to frontend: ' + error.message + '</p>';
+                });
+        }
+
+        function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing backend API...</p>';
+
+            fetch('http://localhost:5000/api/courses')
+                .then(response => response.json())
+                .then(data => {
+                    results.innerHTML = '<p style="color: #10b981;">✅ Backend API is working!</p><pre>' + JSON.stringify(data, null, 2).substring(0, 500) + '...</pre>';
+                })
+                .catch(error => {
+                    results.innerHTML = '<p style="color: #ef4444;">❌ Backend API error: ' + error.message + '</p>';
+                });
+        }
+
+        function testCourses() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing courses endpoint...</p>';
+
+            fetch('http://localhost:5000/api/courses')
+                .then(response => response.json())
+                .then(data => {
+                    const count = data.data ? data.data.length : 0;
+                    results.innerHTML = '<p style="color: #10b981;">✅ Found ' + count + ' courses!</p><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                })
+                .catch(error => {
+                    results.innerHTML = '<p style="color: #ef4444;">❌ Courses API error: ' + error.message + '</p>';
+                });
+        }
+
+        function openConsole() {
+            alert('Press F12 to open browser console\n\nLook for:\n- RED error messages\n- Failed network requests\n- Component errors');
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            console.log('🔍 Diagnostic page loaded');
+            console.log('Frontend should be at: http://localhost:3000');
+            console.log('Backend should be at: http://localhost:5000');
+        });
+    </script>
+</body>
+
+</html>

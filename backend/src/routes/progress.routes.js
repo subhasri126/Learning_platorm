@@ -9,9 +9,9 @@ import { authorize } from '../middleware/authorize.js';
 
 const router = express.Router();
 
-// Learner routes
-router.post('/lessons/:lessonId/complete', authenticate, authorize('LEARNER'), markLessonComplete);
-router.get('/dashboard', authenticate, authorize('LEARNER'), getDashboard);
-router.get('/courses/:courseId', authenticate, authorize('LEARNER'), getCourseDetailedProgress);
+// Learner routes (also allow instructors/admins for demo purposes)
+router.post('/lessons/:lessonId/complete', authenticate, markLessonComplete);
+router.get('/dashboard', authenticate, authorize('user'), getDashboard);
+router.get('/courses/:courseId', authenticate, getCourseDetailedProgress);
 
 export default router;

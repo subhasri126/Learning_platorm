@@ -83,7 +83,7 @@ export const getLeaderboard = async (req, res, next) => {
     
     const topUsers = await prisma.user.findMany({
       where: {
-        role: 'LEARNER'
+        role: 'user'
       },
       select: {
         id: true,
@@ -119,6 +119,7 @@ export const getCourseStats = async (req, res, next) => {
   try {
     const { courseId } = req.params;
     const { userId, role } = req.user;
+    const normalizedRole = (role || '').toLowerCase();
     
     const course = await prisma.course.findUnique({
       where: { id: parseInt(courseId) },
@@ -145,7 +146,7 @@ export const getCourseStats = async (req, res, next) => {
     }
     
     // Only course instructor or admin can view stats
-    if (role !== 'ADMIN' && course.instructorId !== userId) {
+    if (normalizedRole !== 'admin' && course.instructorId !== userId) {
       return res.status(403).json({
         success: false,
         message: 'Access denied.'

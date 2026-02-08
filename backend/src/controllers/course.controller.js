@@ -7,9 +7,10 @@ import prisma from '../config/database.js';
 export const getAllCourses = async (req, res, next) => {
   try {
     const { role, userId } = req.user;
-    
-    const where = role === 'LEARNER' ? { isPublished: true } : {};
-    
+
+    const normalizedRole = role.toLowerCase();
+    const where = normalizedRole === 'user' ? { isPublished: true } : {};
+
     const courses = await prisma.course.findMany({
       where,
       include: {
@@ -22,7 +23,7 @@ export const getAllCourses = async (req, res, next) => {
       },
       orderBy: { createdAt: 'desc' }
     });
-    
+
     res.json({
       success: true,
       data: courses
@@ -39,8 +40,15 @@ export const getAllCourses = async (req, res, next) => {
 export const getCourseById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { role } = req.user;
-    
+    const userRole = req.user?.role || 'user';
+
+    if (isNaN(parseInt(id))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid course ID.'
+      });
+    }
+
     const course = await prisma.course.findUnique({
       where: { id: parseInt(id) },
       include: {
@@ -59,22 +67,23 @@ export const getCourseById = async (req, res, next) => {
         }
       }
     });
-    
+
     if (!course) {
       return res.status(404).json({
         success: false,
         message: 'Course not found.'
       });
     }
-    
+
     // Learners can only see published courses
-    if (role === 'LEARNER' && !course.isPublished) {
+    const normalizedRole = userRole.toLowerCase();
+    if (normalizedRole === 'user' && !course.isPublished) {
       return res.status(403).json({
         success: false,
         message: 'Course not available.'
       });
     }
-    
+
     res.json({
       success: true,
       data: course
@@ -92,14 +101,14 @@ export const createCourse = async (req, res, next) => {
   try {
     const { title, description, thumbnail } = req.body;
     const { userId } = req.user;
-    
+
     if (!title || !description) {
       return res.status(400).json({
         success: false,
         message: 'Title and description are required.'
       });
     }
-    
+
     const course = await prisma.course.create({
       data: {
         title,
@@ -113,7 +122,7 @@ export const createCourse = async (req, res, next) => {
         }
       }
     });
-    
+
     res.status(201).json({
       success: true,
       message: 'Course created successfully.',
@@ -133,26 +142,27 @@ export const updateCourse = async (req, res, next) => {
     const { id } = req.params;
     const { title, description, thumbnail, isPublished } = req.body;
     const { userId, role } = req.user;
-    
+
     const course = await prisma.course.findUnique({
       where: { id: parseInt(id) }
     });
-    
+
     if (!course) {
       return res.status(404).json({
         success: false,
         message: 'Course not found.'
       });
     }
-    
+
     // Only course owner or admin can update
-    if (role !== 'ADMIN' && course.instructorId !== userId) {
+    const normalizedRole = role.toLowerCase();
+    if (normalizedRole !== 'admin' && course.instructorId !== userId) {
       return res.status(403).json({
         success: false,
         message: 'You do not have permission to update this course.'
       });
     }
-    
+
     const updatedCourse = await prisma.course.update({
       where: { id: parseInt(id) },
       data: {
@@ -167,7 +177,7 @@ export const updateCourse = async (req, res, next) => {
         }
       }
     });
-    
+
     res.json({
       success: true,
       message: 'Course updated successfully.',
@@ -186,30 +196,31 @@ export const deleteCourse = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { userId, role } = req.user;
-    
+
     const course = await prisma.course.findUnique({
       where: { id: parseInt(id) }
     });
-    
+
     if (!course) {
       return res.status(404).json({
         success: false,
         message: 'Course not found.'
       });
     }
-    
+
     // Only course owner or admin can delete
-    if (role !== 'ADMIN' && course.instructorId !== userId) {
+    const normalizedRole = role.toLowerCase();
+    if (normalizedRole !== 'admin' && course.instructorId !== userId) {
       return res.status(403).json({
         success: false,
         message: 'You do not have permission to delete this course.'
       });
     }
-    
+
     await prisma.course.delete({
       where: { id: parseInt(id) }
     });
-    
+
     res.json({
       success: true,
       message: 'Course deleted successfully.'
@@ -227,7 +238,7 @@ export const getCourseProgress = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { userId } = req.user;
-    
+
     const course = await prisma.course.findUnique({
       where: { id: parseInt(id) },
       include: {
@@ -240,18 +251,18 @@ export const getCourseProgress = async (req, res, next) => {
         }
       }
     });
-    
+
     if (!course) {
       return res.status(404).json({
         success: false,
         message: 'Course not found.'
       });
     }
-    
+
     const totalLessons = course.lessons.length;
     const completedLessons = course.lessons.filter(l => l.progress.length > 0 && l.progress[0].isCompleted).length;
     const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-    
+
     res.json({
       success: true,
       data: {

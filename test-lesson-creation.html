@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson Creation Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+
+        .container {
+            background: #16213e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #f39c12;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .success {
+            background: #1e4620;
+            border-color: #27ae60;
+            color: #2ecc71;
+        }
+
+        .error {
+            background: #4a1e1e;
+            border-color: #c0392b;
+            color: #e74c3c;
+        }
+
+        .info {
+            background: #1e3a5f;
+            border-color: #3498db;
+            color: #5dade2;
+        }
+
+        .warning {
+            background: #5f4a1e;
+            border-color: #f39c12;
+            color: #f8b739;
+        }
+
+        button {
+            background: #f39c12;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #e67e22;
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        pre {
+            background: #0f0f1e;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            border: 1px solid #333;
+        }
+
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            background: #0f3460;
+            border-radius: 8px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            color: #f39c12;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 10px;
+            background: #0f0f1e;
+            border: 2px dashed #555;
+            border-radius: 6px;
+            color: #eee;
+            width: 100%;
+        }
+
+        .course-info {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🧪 Lesson Creation System Test</h1>
+        <p>This page tests if the lesson creation feature is working properly.</p>
+
+        <div id="results"></div>
+
+        <div class="step">
+            <div class="step-title">Step 1: Login as Instructor</div>
+            <button onclick="testLogin()">Test Login</button>
+        </div>
+
+        <div class="step">
+            <div class="step-title">Step 2: Get Available Courses</div>
+            <button onclick="testGetCourses()" id="btnCourses" disabled>Get Courses</button>
+        </div>
+
+        <div class="step">
+            <div class="step-title">Step 3: Test Lesson Creation Endpoint</div>
+            <button onclick="testLessonEndpoint()" id="btnLesson" disabled>Test Endpoint</button>
+        </div>
+
+        <div class="step">
+            <div class="step-title">Step 4: Upload Test PDF</div>
+            <input type="file" id="pdfFile" accept="application/pdf" disabled>
+            <button onclick="uploadPDF()" id="btnUpload" disabled>Upload PDF Lesson</button>
+        </div>
+
+        <button onclick="runAllTests()" style="background: #27ae60; margin-top: 20px;">▶️ Run All Tests</button>
+    </div>
+
+    <script>
+        let token = null;
+        let courseId = null;
+
+        function addResult(type, title, message, data = null) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `
+                <strong>${title}</strong><br>
+                ${message}
+                ${data ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : ''}
+            `;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        async function testLogin() {
+            try {
+                addResult('info', '🔐 Testing Login...', 'Attempting to login as instructor');
+
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'instructor@learnsphere.com',
+                        password: 'password123'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    token = data.data.token;
+                    addResult('success', '✅ Login Successful',
+                        `Logged in as: ${data.data.user.name} (${data.data.user.role})<br>Token: ${token.substring(0, 30)}...`);
+                    document.getElementById('btnCourses').disabled = false;
+                } else {
+                    addResult('error', '❌ Login Failed', data.message || 'Unknown error');
+                }
+            } catch (error) {
+                addResult('error', '❌ Login Error', error.message);
+            }
+        }
+
+        async function testGetCourses() {
+            try {
+                addResult('info', '📚 Fetching Courses...', 'Getting available courses');
+
+                const response = await fetch('http://localhost:5000/api/courses', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    const courses = data.data;
+                    if (courses.length > 0) {
+                        courseId = courses[0].id;
+                        const courseInfo = `
+                            <div class="course-info">
+                                <strong>Found ${courses.length} course(s)</strong><br><br>
+                                <strong>Test Course:</strong><br>
+                                ID: ${courses[0].id}<br>
+                                Title: ${courses[0].title}<br>
+                                Instructor ID: ${courses[0].instructorId}<br>
+                                Current Lessons: ${courses[0]._count?.lessons || 0}
+                            </div>
+                        `;
+                        addResult('success', '✅ Courses Retrieved', courseInfo);
+                        document.getElementById('btnLesson').disabled = false;
+                        document.getElementById('pdfFile').disabled = false;
+                    } else {
+                        addResult('warning', '⚠️ No Courses Found',
+                            'No courses available. Please create a course first.');
+                    }
+                } else {
+                    addResult('error', '❌ Failed to Get Courses', data.message || 'Unknown error');
+                }
+            } catch (error) {
+                addResult('error', '❌ Error Fetching Courses', error.message);
+            }
+        }
+
+        async function testLessonEndpoint() {
+            try {
+                addResult('info', '🔍 Testing Lesson Endpoint...', 'Checking if lesson creation route is accessible');
+
+                // Test with a simple non-PDF lesson first
+                const testData = {
+                    title: 'Test Lesson - ' + new Date().toLocaleTimeString(),
+                    description: 'This is a test lesson',
+                    content: 'https://www.youtube.com/watch?v=test',
+                    type: 'VIDEO',
+                    duration: 15,
+                    order: 1,
+                    courseId: courseId
+                };
+
+                const response = await fetch('http://localhost:5000/api/lessons', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    addResult('success', '✅ Lesson Endpoint Working',
+                        `Successfully created test lesson: "${data.data.title}"<br>Lesson ID: ${data.data.id}`,
+                        data.data);
+                    document.getElementById('btnUpload').disabled = false;
+                } else {
+                    addResult('error', '❌ Lesson Creation Failed', data.message || 'Unknown error', data);
+                }
+            } catch (error) {
+                addResult('error', '❌ Endpoint Test Error', error.message);
+            }
+        }
+
+        async function uploadPDF() {
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                addResult('warning', '⚠️ No File Selected', 'Please select a PDF file first');
+                return;
+            }
+
+            try {
+                addResult('info', '📤 Uploading PDF...', `File: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+
+                const formData = new FormData();
+                formData.append('title', 'PDF Lesson - ' + file.name);
+                formData.append('description', 'Test PDF upload');
+                formData.append('content', 'file_upload');
+                formData.append('type', 'PDF');
+                formData.append('duration', '20');
+                formData.append('order', '2');
+                formData.append('courseId', courseId);
+                formData.append('file', file);
+
+                const response = await fetch('http://localhost:5000/api/lessons', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    addResult('success', '✅ PDF Upload Successful!',
+                        `PDF lesson created successfully!<br>Lesson ID: ${data.data.id}<br>Title: ${data.data.title}`,
+                        data.data);
+                } else {
+                    addResult('error', '❌ PDF Upload Failed', data.message || 'Unknown error', data);
+                }
+            } catch (error) {
+                addResult('error', '❌ Upload Error', error.message);
+            }
+        }
+
+        async function runAllTests() {
+            document.getElementById('results').innerHTML = '';
+            await testLogin();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (token) {
+                await testGetCourses();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                if (courseId) {
+                    await testLessonEndpoint();
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

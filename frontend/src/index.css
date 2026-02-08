@@ -2,52 +2,183 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+}
+
+.theme-light {
+  color-scheme: light;
+}
+
+.theme-light body {
+  background-color: #f6f7fb;
+  color: #0f172a;
+}
+
+.theme-light .card,
+.theme-light .card-solid,
+.theme-light .card-gradient {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.theme-light .home-feature-card {
+  background-color: #f1f5f9;
+  border-color: #1c3c65;
+}
+
+.theme-light .nav-surface {
+  background-color: rgba(246, 247, 251, 0.9);
+  border-color: #e2e8f0;
+}
+
+.theme-light .input-field {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  color: #0f172a;
+}
+
+.theme-light .progress-bar,
+.theme-light .xp-bar {
+  background-color: #e2e8f0;
+}
+
+.theme-light .text-white {
+  color: #0f172a !important;
+}
+
+.theme-light .text-gray-100 {
+  color: #1e293b !important;
+}
+
+.theme-light .text-gray-200 {
+  color: #334155 !important;
+}
+
+.theme-light .text-gray-300 {
+  color: #475569 !important;
+}
+
+.theme-light .text-gray-400 {
+  color: #64748b !important;
+}
+
+.theme-light .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+.theme-light .text-primary-400 {
+  color: #4f46e5 !important;
+}
+
+.theme-light .bg-dark-950,
+.theme-light .bg-dark-900 {
+  background-color: #f8fafc !important;
+}
+
+.theme-light .bg-dark-850,
+.theme-light .bg-dark-800,
+.theme-light .bg-dark-750,
+.theme-light .bg-dark-700 {
+  background-color: #ffffff !important;
+}
+
+.theme-light .bg-dark-600 {
+  background-color: #f1f5f9 !important;
+}
+
+.theme-light .border-dark-800,
+.theme-light .border-dark-700,
+.theme-light .border-dark-600 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Specific opacity overrides if needed, though base overrides usually work */
+.theme-light .bg-dark-700\/70 {
+  background-color: rgba(226, 232, 240, 0.7) !important;
+}
+
+/* Invert gradients for light mode */
+.theme-light .bg-gradient-to-br.from-dark-900 {
+  background-image: linear-gradient(to bottom right, #f8fafc, #eff6ff) !important;
+}
+
+.theme-light .shadow-glow-lg,
+.theme-light .shadow-glow {
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15) !important;
+}
+
+.theme-light .btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+}
+
+.theme-light .btn-secondary {
+  background-color: #eef2f7;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+
+.theme-light .btn-ghost {
+  color: #475569;
+  border-color: #e2e8f0;
+}
+
+.theme-light .card-gradient {
+  background-image: linear-gradient(135deg, #f8fafc, #eef2ff);
+}
+
+.theme-light .progress-fill,
+.theme-light .xp-fill {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+}
+
 @layer base {
   body {
     @apply bg-dark-900 text-gray-100;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    transition: background-color 250ms ease, color 250ms ease;
+    text-rendering: optimizeLegibility;
+  }
+
+  a,
+  button {
+    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
   }
 }
 
 @layer components {
+
   /* Modern Gaming Buttons */
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-xl font-semibold
-           hover:from-primary-500 hover:to-primary-600 hover:shadow-glow
-           active:scale-95 transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-dark-900;
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-primary-500 hover:to-primary-600 hover:shadow-glow active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-dark-900;
   }
 
   .btn-secondary {
-    @apply bg-dark-700 text-gray-100 px-6 py-3 rounded-xl font-semibold border border-dark-600
-           hover:bg-dark-600 hover:border-dark-500 active:scale-95 transition-all duration-200;
+    @apply bg-dark-700 text-gray-100 px-6 py-3 rounded-xl font-semibold border border-dark-600 hover:bg-dark-600 hover:border-dark-500 active:scale-[0.98] transition-all duration-200;
   }
 
   .btn-success {
-    @apply bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl font-semibold
-           hover:from-green-500 hover:to-green-600 hover:shadow-glow-green active:scale-95 transition-all;
+    @apply bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-green-500 hover:to-green-600 hover:shadow-glow-green active:scale-95 transition-all;
   }
 
   .btn-danger {
-    @apply bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-xl font-semibold
-           hover:from-red-500 hover:to-red-600 active:scale-95 transition-all;
+    @apply bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-3 rounded-xl font-semibold hover:from-red-500 hover:to-red-600 active:scale-95 transition-all;
   }
 
   .btn-ghost {
-    @apply bg-transparent text-gray-300 px-6 py-3 rounded-xl font-semibold border border-dark-600
-           hover:bg-dark-800 hover:text-white active:scale-95 transition-all;
+    @apply bg-transparent text-gray-300 px-6 py-3 rounded-xl font-semibold border border-dark-600 hover:bg-dark-800 hover:text-white active:scale-[0.98] transition-all;
   }
 
   /* Modern Input Fields */
   .input-field {
-    @apply w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-gray-100
-           focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-dark-750
-           placeholder:text-gray-500 transition-all;
+    @apply w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-dark-750 placeholder:text-gray-500 transition-all;
   }
 
   /* Glassmorphism Cards */
   .card {
-    @apply bg-dark-800/50 backdrop-blur-xl rounded-2xl shadow-card border border-dark-700/50 p-6
-           hover:shadow-card-hover hover:border-dark-600/50 transition-all duration-300;
+    @apply bg-dark-800/50 backdrop-blur-xl rounded-2xl shadow-card border border-dark-700/50 p-6 hover:shadow-card-hover hover:border-dark-600/50 transition-all duration-300;
   }
 
   .card-solid {
@@ -58,8 +189,17 @@
     @apply bg-gradient-to-br from-dark-800 to-dark-850 rounded-2xl shadow-card border border-dark-700 p-6;
   }
 
+  .home-feature-card {
+    @apply bg-dark-800/70 border border-dark-700/60 rounded-2xl p-5 shadow-card;
+  }
+
+  .nav-surface {
+    @apply sticky top-0 z-50 backdrop-blur-xl border-b border-dark-700;
+    background-color: rgba(15, 23, 42, 0.88);
+  }
+
   .card-hover {
-    @apply card cursor-pointer transform hover:scale-105 hover:-translate-y-1;
+    @apply card cursor-pointer transform hover:-translate-y-1;
   }
 
   /* XP and Progress Bars */
@@ -76,8 +216,7 @@
   }
 
   .xp-fill {
-    @apply h-full bg-gradient-to-r from-accent-purple to-accent-pink rounded-full
-           transition-all duration-700 ease-out relative overflow-hidden;
+    @apply h-full bg-gradient-to-r from-accent-purple to-accent-pink rounded-full transition-all duration-700 ease-out relative overflow-hidden;
   }
 
   /* Badge Styles */
@@ -98,8 +237,7 @@
   }
 
   .badge-level {
-    @apply bg-gradient-to-r from-accent-purple to-accent-pink text-white px-4 py-1.5 rounded-full
-           font-bold text-sm shadow-glow;
+    @apply bg-gradient-to-r from-accent-purple to-accent-pink text-white px-4 py-1.5 rounded-full font-bold text-sm shadow-glow;
   }
 
   .badge-success {
@@ -116,7 +254,7 @@
 
   /* Stat Cards */
   .stat-card {
-    @apply card-gradient p-4 text-center hover:scale-105 transition-transform cursor-pointer;
+    @apply card-gradient p-4 text-center hover:-translate-y-1 transition-transform cursor-pointer;
   }
 
   /* Glow Effects */
@@ -138,15 +276,12 @@
 
   /* Achievement Toast */
   .achievement-toast {
-    @apply fixed top-20 right-4 bg-gradient-to-r from-accent-gold to-accent-orange
-           text-white px-6 py-4 rounded-xl shadow-glow-lg z-50
-           animate-slide-up;
+    @apply fixed top-20 right-4 bg-gradient-to-r from-accent-gold to-accent-orange text-white px-6 py-4 rounded-xl shadow-glow-lg z-50 animate-slide-up;
   }
 
   /* Quiz Question Card */
   .quiz-option {
-    @apply card-solid p-4 cursor-pointer border-2 border-dark-700
-           hover:border-primary-500 hover:bg-dark-750 transition-all;
+    @apply card-solid p-4 cursor-pointer border-2 border-dark-700 hover:border-primary-500 hover:bg-dark-750 transition-all;
   }
 
   .quiz-option-selected {

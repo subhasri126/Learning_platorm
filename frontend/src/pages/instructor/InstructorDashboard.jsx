@@ -3,28 +3,31 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { courseAPI } from '../../api/course.api';
+import { doubtAPI } from '../../api/doubt.api';
 import { BookOpen, Users, BarChart3, PlusCircle, Edit, Eye, EyeOff, TrendingUp } from 'lucide-react';
-import InstructorNavbar from '../../components/instructor/InstructorNavbar';
 
 const InstructorDashboard = () => {
   const { user } = useAuth();
   const [courses, setCourses] = useState([]);
   const [stats, setStats] = useState({ total: 0, published: 0, draft: 0, totalLearners: 0 });
   const [loading, setLoading] = useState(true);
+  const [doubts, setDoubts] = useState([]);
 
   useEffect(() => {
     fetchCourses();
+    fetchDoubts();
   }, []);
 
   const fetchCourses = async () => {
     try {
       const response = await courseAPI.getAll();
-      const myCourses = response.data.data.filter(c => c.instructorId === user.id);
+      const data = Array.isArray(response.data.data) ? response.data.data : [];
+      const myCourses = data.filter(c => c.instructorId == user.id);
       setCourses(myCourses);
-      
+
       const published = myCourses.filter(c => c.isPublished).length;
       const draft = myCourses.filter(c => !c.isPublished).length;
-      
+
       setStats({
         total: myCourses.length,
         published,
@@ -38,6 +41,15 @@ const InstructorDashboard = () => {
     }
   };
 
+  const fetchDoubts = async () => {
+    try {
+      const response = await doubtAPI.getAll();
+      setDoubts(response.data.data || []);
+    } catch (error) {
+      setDoubts([]);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-dark-900 flex items-center justify-center">
@@ -47,8 +59,7 @@ const InstructorDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-900">
-      <InstructorNavbar />
+    <div className="bg-dark-900">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -57,7 +68,7 @@ const InstructorDashboard = () => {
             <h1 className="text-3xl font-bold text-white mb-2">Instructor Dashboard</h1>
             <p className="text-gray-400">Manage your courses and track learner progress</p>
           </div>
-          
+
           <Link to="/courses/create" className="btn-primary">
             <PlusCircle className="w-5 h-5 inline mr-2" />
             Create Course
@@ -134,6 +145,62 @@ const InstructorDashboard = () => {
           </motion.div>
         </div>
 
+        {/* Course Tools */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="card-solid">
+            <h3 className="text-lg font-semibold text-white mb-3">Content Builder</h3>
+            <p className="text-sm text-gray-400 mb-4">Add lessons and resources to your courses.</p>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-3 py-1 rounded-full text-xs bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 font-semibold">📄 PDF Lesson</span>
+              <span className="px-3 py-1 rounded-full text-xs bg-dark-700 text-gray-300">Video Lesson</span>
+              <span className="px-3 py-1 rounded-full text-xs bg-dark-700 text-gray-300">Document Lesson</span>
+              <span className="px-3 py-1 rounded-full text-xs bg-dark-700 text-gray-300">Image Lesson</span>
+            </div>
+          </div>
+          <div className="card-solid">
+            <h3 className="text-lg font-semibold text-white mb-3">Quiz Builder</h3>
+            <p className="text-sm text-gray-400 mb-4">Attempt-based points are applied automatically.</p>
+            <div className="text-xs text-gray-400 space-y-2">
+              <div className="flex justify-between">
+                <span>Attempt 1</span>
+                <span>100% points</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Attempt 2</span>
+                <span>90% points</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Attempt 3</span>
+                <span>80% points</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Minimum</span>
+                <span>50% points</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card-solid mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-white">Learner Doubts</h2>
+            <button onClick={fetchDoubts} className="btn-secondary text-sm">Refresh</button>
+          </div>
+          {doubts.length ? (
+            <div className="space-y-3">
+              {doubts.map((doubt) => (
+                <div key={doubt.id} className="bg-dark-800/60 rounded-xl p-4 border border-dark-700">
+                  <div className="text-sm text-gray-400 mb-1">{doubt.courseTitle}</div>
+                  <div className="text-white font-medium mb-2">{doubt.question}</div>
+                  <div className="text-xs text-gray-500">Received {new Date(doubt.createdAt).toLocaleString()}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-500 text-sm">No new doubts yet.</div>
+          )}
+        </div>
+
         {/* Courses Table */}
         <div className="card-solid">
           <div className="flex items-center justify-between mb-6">
@@ -150,6 +217,7 @@ const InstructorDashboard = () => {
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Status</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Learners</th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Lessons</th>
+                    <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Progress</th>
                     <th className="text-right py-3 px-4 text-sm font-semibold text-gray-400">Actions</th>
                   </tr>
                 </thead>
@@ -163,10 +231,10 @@ const InstructorDashboard = () => {
                       className="border-b border-dark-700 hover:bg-dark-800 transition-colors"
                     >
                       <td className="py-4 px-4">
-                        <div>
-                          <div className="font-medium text-white">{course.title}</div>
+                        <Link to={`/courses/${course.id}`} className="hover:underline group">
+                          <div className="font-medium text-white group-hover:text-primary-400 transition-colors uppercase tracking-tight">{course.title}</div>
                           <div className="text-sm text-gray-400 line-clamp-1">{course.description}</div>
-                        </div>
+                        </Link>
                       </td>
                       <td className="py-4 px-4">
                         {course.isPublished ? (
@@ -180,6 +248,9 @@ const InstructorDashboard = () => {
                       </td>
                       <td className="py-4 px-4">
                         <span className="text-white">{course._count?.lessons || 0}</span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="text-gray-400 text-sm">View per learner</span>
                       </td>
                       <td className="py-4 px-4 text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -203,6 +274,13 @@ const InstructorDashboard = () => {
                             title="View Stats"
                           >
                             <BarChart3 className="w-4 h-4 text-gray-400" />
+                          </Link>
+                          <Link
+                            to={`/courses/${course.id}/progress`}
+                            className="p-2 hover:bg-dark-700 rounded-lg transition-colors"
+                            title="Learner Progress"
+                          >
+                            <Users className="w-4 h-4 text-gray-400" />
                           </Link>
                         </div>
                       </td>

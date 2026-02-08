@@ -34,6 +34,7 @@ export const getQuizById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { role } = req.user;
+    const normalizedRole = (role || '').toLowerCase();
     
     const quiz = await prisma.quiz.findUnique({
       where: { id: parseInt(id) },
@@ -48,7 +49,7 @@ export const getQuizById = async (req, res, next) => {
             points: true,
             order: true,
             // Don't send correct answer to learners
-            ...(role !== 'LEARNER' && { correctAnswer: true })
+            ...(normalizedRole !== 'user' && { correctAnswer: true })
           }
         }
       }
@@ -78,6 +79,7 @@ export const createQuiz = async (req, res, next) => {
   try {
     const { title, description, courseId, maxPoints, questions } = req.body;
     const { userId, role } = req.user;
+    const normalizedRole = (role || '').toLowerCase();
     
     if (!title || !courseId) {
       return res.status(400).json({
@@ -98,7 +100,7 @@ export const createQuiz = async (req, res, next) => {
       });
     }
     
-    if (role !== 'ADMIN' && course.instructorId !== userId) {
+    if (normalizedRole !== 'admin' && course.instructorId !== userId) {
       return res.status(403).json({
         success: false,
         message: 'You do not have permission to add quizzes to this course.'
@@ -148,6 +150,7 @@ export const addQuestion = async (req, res, next) => {
     const { id } = req.params;
     const { questionText, options, correctAnswer, points, order } = req.body;
     const { userId, role } = req.user;
+    const normalizedRole = (role || '').toLowerCase();
     
     if (!questionText || !options || !correctAnswer) {
       return res.status(400).json({
@@ -168,7 +171,7 @@ export const addQuestion = async (req, res, next) => {
       });
     }
     
-    if (role !== 'ADMIN' && quiz.course.instructorId !== userId) {
+    if (normalizedRole !== 'admin' && quiz.course.instructorId !== userId) {
       return res.status(403).json({
         success: false,
         message: 'You do not have permission to modify this quiz.'
@@ -330,6 +333,64 @@ export const getQuizAttempts = async (req, res, next) => {
     res.json({
       success: true,
       data: attempts
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Score quiz answers without saving attempt
+ * POST /api/quizzes/:id/score
+ */
+export const scoreQuiz = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { answers } = req.body;
+
+    if (!answers || typeof answers !== 'object') {
+      return res.status(400).json({
+        success: false,
+        message: 'Answers are required.'
+      });
+    }
+
+    const quiz = await prisma.quiz.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        questions: true
+      }
+    });
+
+    if (!quiz) {
+      return res.status(404).json({
+        success: false,
+        message: 'Quiz not found.'
+      });
+    }
+
+    let totalScore = 0;
+    const results = [];
+
+    for (const question of quiz.questions) {
+      const userAnswer = answers[question.id.toString()];
+      const isCorrect = userAnswer === question.correctAnswer;
+
+      if (isCorrect) {
+        totalScore += question.points;
+        results.push({ questionId: question.id, isCorrect: true, earnedPoints: question.points });
+      } else {
+        results.push({ questionId: question.id, isCorrect: false, earnedPoints: 0 });
+      }
+    }
+
+    res.json({
+      success: true,
+      data: {
+        score: totalScore,
+        maxPoints: quiz.maxPoints,
+        results
+      }
     });
   } catch (error) {
     next(error);

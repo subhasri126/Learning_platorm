@@ -39,7 +39,8 @@ const QuizResult = () => {
     );
   }
 
-  const percentage = Math.round((result.score / result.maxPoints) * 100);
+  const maxPointsSafe = result.maxPoints || 0;
+  const percentage = maxPointsSafe ? Math.round((result.score / maxPointsSafe) * 100) : 0;
   const passed = percentage >= 60;
   const isLowScore = percentage < 60;
 

@@ -39,27 +39,39 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
-    const response = await axios.post('/auth/login', { email, password });
-    const { token: newToken, user: userData } = response.data.data;
-    
+  const login = async (email, password, role) => {
+    const response = await axios.post('/auth/login', { email, password, role });
+
+    // Check if response has flat structure or old nested structure (robustness)
+    const data = response.data.data || response.data;
+    const { token: newToken, user: userData } = data;
+
+    // Validate token exists
+    if (!newToken) throw new Error('No token received from server');
+
     localStorage.setItem('token', newToken);
     setToken(newToken);
     setUser(userData);
     axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-    
+
     return response.data;
   };
 
-  const register = async (email, password, name, role = 'LEARNER') => {
+  const register = async (email, password, name, role) => {
     const response = await axios.post('/auth/register', { email, password, name, role });
-    const { token: newToken, user: userData } = response.data.data;
-    
+
+    // Check if response has flat structure or old nested structure (robustness)
+    const data = response.data.data || response.data;
+    const { token: newToken, user: userData } = data;
+
+    // Validate token exists
+    if (!newToken) throw new Error('No token received from server');
+
     localStorage.setItem('token', newToken);
     setToken(newToken);
     setUser(userData);
     axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-    
+
     return response.data;
   };
 
@@ -78,9 +90,9 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'ADMIN',
-    isInstructor: user?.role === 'INSTRUCTOR',
-    isLearner: user?.role === 'LEARNER'
+    isAdmin: user?.role === 'admin',
+    isInstructor: user?.role === 'instructor',
+    isLearner: user?.role === 'user'
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
